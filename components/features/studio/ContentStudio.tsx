@@ -39,11 +39,11 @@ export function ContentStudio() {
         : "Buatkan caption penjualan umum untuk toko serba ada yang mempromosikan barang-barang berkualitas.";
 
       const result = await generateCaption(prompt, image || undefined);
-      setCaption(result);
+      setCaption(result || "");
     } catch (error) {
       console.error(error);
       setCaption(
-        "Maaf, terjadi kesalahan saat menghubungkan ke AI. Pastikan API Key Anda valid."
+        "Maaf, terjadi kesalahan saat menghubungkan ke AI. Pastikan API Key Anda valid.",
       );
     } finally {
       setIsProcessing(false);
@@ -71,7 +71,7 @@ export function ContentStudio() {
               className={cn(
                 "border-2 border-dashed border-gray-300 rounded-xl h-80 flex flex-col items-center justify-center transition-colors",
                 !image && "hover:border-[var(--primary)] hover:bg-indigo-50/30",
-                image && "border-solid border-transparent"
+                image && "border-solid border-transparent",
               )}
             >
               {image ? (
@@ -105,7 +105,7 @@ export function ContentStudio() {
                 type="file"
                 className={cn(
                   "absolute inset-0 w-full h-full opacity-0 cursor-pointer",
-                  image && "hidden"
+                  image && "hidden",
                 )}
                 onChange={handleUpload}
                 accept="image/*"
@@ -124,7 +124,7 @@ export function ContentStudio() {
                 "flex-1 py-2.5 px-4 text-white rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all shadow-sm shadow-indigo-200",
                 isProcessing
                   ? "bg-gray-300 cursor-not-allowed"
-                  : "bg-[var(--primary)] hover:bg-indigo-600"
+                  : "bg-[var(--primary)] hover:bg-indigo-600",
               )}
             >
               {isProcessing ? (
