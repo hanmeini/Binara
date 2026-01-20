@@ -24,43 +24,43 @@ const stats = [
 const companies = [
   {
     name: "Kopi Janji Jiwa",
-    logo: "https://placehold.co/150x60/transparent/333333?text=Janji+Jiwa",
+    logo: "/images/du anyam.png",
   },
   {
     name: "Haus!",
-    logo: "https://placehold.co/150x60/transparent/333333?text=Haus!",
+    logo: "/images/es-teh-nusantara-logo-png_seeklogo-438137-removebg-preview.png",
   },
   {
     name: "Kebab Turki Baba Rafi",
-    logo: "https://placehold.co/150x60/transparent/333333?text=Baba+Rafi",
+    logo: "/images/janji jiw.png",
   },
   {
     name: "Sabana",
-    logo: "https://placehold.co/150x60/transparent/333333?text=Sabana",
+    logo: "/images/du ayam.png",
   },
   {
     name: "Teh Poci",
-    logo: "https://placehold.co/150x60/transparent/333333?text=Teh+Poci",
+    logo: "/images/kopi kenangan.jpg",
   },
   {
     name: "Geprek Bensu",
-    logo: "https://placehold.co/150x60/transparent/333333?text=Geprek+Bensu",
+    logo: "/images/du anyam.png",
   },
   {
     name: "Fore Coffee",
-    logo: "https://placehold.co/150x60/transparent/333333?text=Fore",
+    logo: "/images/roti gembong.png",
   },
   {
     name: "Ngikan",
-    logo: "https://placehold.co/150x60/transparent/333333?text=Ngikan",
+    logo: "/images/du anyam.png",
   },
   {
     name: "Tahu Jeletot",
-    logo: "https://placehold.co/150x60/transparent/333333?text=Tahu+Jeletot",
+    logo: "/images/tiebymin.png",
   },
   {
     name: "Bebek Kaleyo",
-    logo: "https://placehold.co/150x60/transparent/333333?text=Bebek+Kaleyo",
+    logo: "/images/jus-semangka.png",
   },
 ];
 

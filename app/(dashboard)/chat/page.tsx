@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   Send,
   MessageSquare,
   Plus,
   Loader2,
   LayoutDashboard,
+  Menu,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
@@ -37,6 +40,8 @@ export default function ChatPage() {
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loadingResponse, setLoadingResponse] = useState(false);
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -48,6 +53,11 @@ export default function ChatPage() {
     });
     return () => unsubscribe();
   }, [user]);
+
+  // For portal mounting
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Subscribe to messages when active chat changes
   useEffect(() => {
@@ -184,6 +194,127 @@ export default function ChatPage() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Hamburger Menu & Sidebar */}
+      <button
+        onClick={() => setShowMobileSidebar(true)}
+        className="md:hidden fixed top-4 left-4 z-40 p-2.5 bg-[#FF9600] text-white rounded-xl shadow-lg hover:bg-[#e68a00] transition-colors"
+      >
+        <Menu className="w-5 h-5" />
+      </button>
+
+      {/* Mobile Sidebar via Portal */}
+      {mounted &&
+        createPortal(
+          <>
+            {showMobileSidebar && (
+              <>
+                {/* Backdrop */}
+                <div
+                  onClick={() => setShowMobileSidebar(false)}
+                  className="md:hidden fixed inset-0 bg-black/30 z-[100] backdrop-blur-sm"
+                />
+                {/* Drawer */}
+                <div className="md:hidden fixed top-0 left-0 h-screen w-80 bg-[#f8f9fa] z-[110] shadow-2xl flex flex-col transform transition-transform duration-300">
+                  <div className="p-4 border-b border-gray-100 flex justify-between items-center">
+                    <h2 className="text-lg font-bold text-gray-800">
+                      Histori Chat
+                    </h2>
+                    <button
+                      onClick={() => setShowMobileSidebar(false)}
+                      className="p-2 text-gray-500 hover:text-gray-900 bg-gray-100 rounded-full"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <div className="p-4 border-b border-gray-100">
+                    <button
+                      onClick={() => {
+                        router.push("/dashboard");
+                        setShowMobileSidebar(false);
+                      }}
+                      className="w-full flex items-center justify-center gap-2 bg-[#FF9600] text-white py-3 rounded-xl font-medium hover:bg-[#e68a00] transition-colors shadow-sm"
+                    >
+                      <LayoutDashboard className="w-5 h-5" />
+                      Dashboard
+                    </button>
+                  </div>
+
+                  <div className="p-4 overflow-y-auto flex-1">
+                    <div className="flex justify-between items-center mb-3 px-2">
+                      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Histori
+                      </h3>
+                      <button
+                        onClick={() => {
+                          startNewChat();
+                          setShowMobileSidebar(false);
+                        }}
+                        className="text-xs text-[#FF9600] hover:underline font-medium flex items-center gap-1"
+                      >
+                        <Plus className="w-3 h-3" /> Baru
+                      </button>
+                    </div>
+
+                    <div className="space-y-1">
+                      {chats.length === 0 ? (
+                        <p className="text-sm text-gray-400 text-center py-4 italic">
+                          Belum ada percakapan
+                        </p>
+                      ) : (
+                        chats.map((chat) => (
+                          <button
+                            key={chat.id}
+                            onClick={() => {
+                              setActiveChatId(chat.id);
+                              setShowMobileSidebar(false);
+                            }}
+                            className={cn(
+                              "w-full text-left px-3 py-2.5 rounded-lg transition-colors flex items-center gap-3 group text-sm",
+                              activeChatId === chat.id
+                                ? "bg-white shadow-sm border border-gray-100 text-[#FF9600] font-medium"
+                                : "text-gray-600 hover:bg-gray-100",
+                            )}
+                          >
+                            <MessageSquare
+                              className={cn(
+                                "w-4 h-4",
+                                activeChatId === chat.id
+                                  ? "text-[#FF9600]"
+                                  : "text-gray-400 group-hover:text-[#FF9600]",
+                              )}
+                            />
+                            <span className="truncate flex-1">
+                              {chat.title}
+                            </span>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="p-4 border-t border-gray-100">
+                    <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-white transition-colors cursor-pointer border border-transparent hover:border-gray-200">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-orange-400 to-yellow-400 flex items-center justify-center text-white font-bold text-xs ring-2 ring-white shadow-sm">
+                        Pro
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-gray-800">
+                          Upgrade to Plus
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Get better insights
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </>,
+          document.body,
+        )}
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col h-full relative">

@@ -53,6 +53,23 @@ export async function generateCaption(prompt: string, imageBase64?: string) {
 }
 
 export async function generateDashboardData(month: string = "Januari", year: string = "2026") {
+  // Check cache first (1 hour expiry)
+  const cacheKey = `dashboard_data_${month}_${year}`;
+  const cacheExpiryKey = `${cacheKey}_expiry`;
+  
+  if (typeof window !== "undefined") {
+    const cached = localStorage.getItem(cacheKey);
+    const expiry = localStorage.getItem(cacheExpiryKey);
+    
+    if (cached && expiry) {
+      const isExpired = Date.now() > parseInt(expiry);
+      if (!isExpired) {
+        console.log("Using cached dashboard data");
+        return JSON.parse(cached);
+      }
+    }
+  }
+
   const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
   const prompt = `
@@ -84,11 +101,30 @@ export async function generateDashboardData(month: string = "Januari", year: str
     
     // Clean up potential markdown code block syntax if Gemini adds it
     const jsonString = text.replace(/```json/g, "").replace(/```/g, "").trim();
+    const data = JSON.parse(jsonString);
     
-    return JSON.parse(jsonString);
-  } catch (error) {
+    // Cache the data (1 hour = 3600000ms)
+    if (typeof window !== "undefined") {
+      localStorage.setItem(cacheKey, JSON.stringify(data));
+      localStorage.setItem(cacheExpiryKey, (Date.now() + 3600000).toString());
+      console.log("Dashboard data cached successfully");
+    }
+    
+    return data;
+  } catch (error: any) {
     console.error("Failed to generate dashboard data:", error);
-    // Fallback data
+    
+    // Try to use expired cache as last resort
+    if (typeof window !== "undefined") {
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        console.log("Using expired cache due to API error");
+        return JSON.parse(cached);
+      }
+    }
+    
+    // Fallback data with quota warning
+    console.warn("⚠️ Using fallback data - Gemini API quota may be exceeded");
     return {
       stats: {
         views: "1.245",
