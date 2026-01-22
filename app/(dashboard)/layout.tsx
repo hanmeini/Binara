@@ -32,7 +32,8 @@ export default function DashboardLayout({
   }
 
   const isChatPage = pathname === "/chat";
-  const isTemplatePage = pathname.startsWith("/template");
+  const isTemplatePage =
+    pathname.startsWith("/template") || pathname.startsWith("/history");
 
   return (
     <div className="flex min-h-screen bg-gray-50">

@@ -5,6 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Upload, Loader2, Sparkles, Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { generateDesign } from "@/app/actions/generateDesign";
+import { uploadToCloudinary } from "@/lib/cloudinary";
+import { db, auth } from "@/lib/firebase/config";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 interface DesignGeneratorModalProps {
   isOpen: boolean;
@@ -51,6 +54,30 @@ export function DesignGeneratorModal({
       const generatedDataUrl = await generateDesign(formData, apiKey);
 
       setGeneratedImage(generatedDataUrl);
+
+      // --- Persistence Logic ---
+      if (auth.currentUser) {
+        // 1. Convert Data URL to Blob for upload
+        const response = await fetch(generatedDataUrl);
+        const blob = await response.blob();
+        const imageFile = new File([blob], "generated-design.png", {
+          type: "image/png",
+        });
+
+        // 2. Upload to Cloudinary
+        const cloudinaryUrl = await uploadToCloudinary(imageFile);
+
+        // 3. Save to Firestore
+        await addDoc(collection(db, "generated_designs"), {
+          userId: auth.currentUser.uid,
+          imageUrl: cloudinaryUrl,
+          prompt: prompt,
+          style: style,
+          productName: productName,
+          createdAt: serverTimestamp(),
+        });
+        console.log("Design saved to history!");
+      }
     } catch (error: any) {
       console.error("Generation failed:", error);
       alert(error.message || "Something went wrong during generation.");
